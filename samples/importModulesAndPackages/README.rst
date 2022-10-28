@@ -5,74 +5,128 @@ Python Imports
 About
 -----
 
-Importing python modules and packages.
+The sample teaches about importing python modules and packages.
 
 Getting Started
 ---------------
 
-The ``import`` keyword makes code in one ``module`` or ``package`` available in another ``module`` or ``package``. A module is a python file. A ``package`` is a directory containing ``modules``. Directories without an ``__init__.py`` file are ``namespace packages``, otherwise ``packages``.
+The ``import`` keyword makes code in one ``module`` (python file) or ``package`` available in another ``module``. A ``package`` is a ``module`` decoupled into different modules, or a set of modules. The structure of a ``package`` is simply a directory containing the ``modules`` (A package can have sub-packages). The ``__init__.py`` file in a package specifies which package modules are imported when the package is imported, allowing the package to have private modules/packages. If a package does not have an ``__init__.py`` file, it is called a ``namespace package`` and it requires that all its modules be imported individually (:ref:`example 3 <example_3>`.)
 
-The ``__init__.py`` file contains the contents of the package when it’s treated as a module. It can be left empty. Below, ``package_one.module_one.whoami`` throws an ``AttributeError`` error if ``__init__.py__`` is empty or doesn't exist.
-
-.. code:: python
-
-    >>> (.env) samples-python/samples/importModulesAndPackages
-    >>> dir()
-    ['__annotations__', '__builtins__', '__doc__', '__loader__', '__name__', '__package__', '__spec__']
-
-    >>> import module_one
-    module_one
-    >>> dir()
-    ['__builtins__', '__cached__', '__doc__', '__file__', '__loader__', '__name__', '__package__', '__spec__', 'var_one']
-
-    >>> import package_one
-    module_one
-    package_one.module_one
-    >>> dir()
-    ['__annotations__', '__builtins__', '__doc__', '__loader__', '__name__', '__package__', '__spec__', 'module_one', 'package_one']
-
-    >>> package_one
-    <module 'package_one' (namespace)>
-
-    >>> module_one.whoami
-    'module_one'
-    >>> package_one.module_one.whoami
-    Traceback (most recent call last):
-    File "<stdin>", line 1, in <module>
-    AttributeError: module 'package_one' has no attribute 'module_one'
-
-    >>> dir(module_one)
-    ['__builtins__', '__cached__', '__doc__', '__file__', '__loader__', '__name__', '__package__', '__spec__', 'whoami']
-
-    >>> dir(package_one)
-    ['__doc__', '__file__', '__loader__', '__name__', '__package__', '__path__', '__spec__']
-
-    >>> from package_one import module_one as pkg_module_one
-    >>> dir()
-    ['__annotations__', '__builtins__', '__doc__', '__loader__', '__name__', '__package__', '__spec__', 'module_one', 'package_one', 'pkg_module_one']
-    >>> pkg_module_one.whoami
-    'package_one.module_one'
-
-``__init__.py`` defines which modules are imported. Adding a file ``__init__.py__`` with the following contents:
+Example 1
+~~~~~~~~~
 
 .. code:: python
 
-    from . import module_one
+   # interpreter at sample root
+   >>> import mod_2
+   >>> dir()
+   [
+       ...
+       'mod_2'
+    ]
+   >>> dir(mod_2)
+   [
+      ...
+      'mod',
+      'mod_1'
+   ]
+   >>> dir(mod_2.mod_1)
+   [
+      ...
+      'mod',
+      'pkg_2'
+   ]
+   >>> dir(mod_2.mod_1.pkg_2)
+   [
+      ...
+      'mod',
+      'pkg'
+   ]
+   >>> dir(mod_2.mod_1.pkg_2.pkg)
+   [
+      ...
+      'mod'
+   ]
+   >>> mod_2.mod
+   'mod_2'
+   >>> mod_2.mod_1.mod
+   'mod_1'
+   >>> mod_2.mod_1.pkg_2.mod.mod
+   'pkg_2.mod'
+   >>> mod_2.mod_1.pkg_2.pkg.mod.mod
+   'pkg_2.pkg.mod'
 
-Enables the following:
+Example 2
+~~~~~~~~~
 
 .. code:: python
 
-    >>> (.env) samples-python/samples/importModulesAndPackages
-    >> import package_one
+   # package interpreter at sample root
+   >>> from pkg_3 import mod
+   >>> dir(mod)
+   [
+      ...
+      'mod',
+      'mod_1'
+   ]
+   >>> mod.mod
+   'pkg_3.mod'
+   >>> mod.mod_1.mod
+   'mod_1'
 
-    >>> package_one
-    <module 'package_one' from '.../samples-python/samples/importModulesAndPackages/package_one/__init__.py'>
+.. _example_3:
 
-    >>> package_one.module_one.whoami
-    'package_one.module_one'
+Example 3
+~~~~~~~~~
 
-Notice how ``import module_one`` in ``package_one/module_one.py`` recognized the module ``module_one.py``. *TODO*: continue with ``namespace`` and ``sys.path``.
+.. code:: python
+
+   # interpreter at sample root
+   >>> import pkg_3
+   >>> dir(pkg_3)
+   [...]
+   >>> import pkg_1
+   >>> dir(pkg_1)
+   [..., 'mod']
+   >>> pkg_1.mod
+   <module 'pkg_1.mod' from '.../samples-python/samples/importModulesAndPackages/pkg_1/mod.py'>
+   >>> pkg_3.mod
+   Traceback (most recent call last):
+     File "<stdin>", line 1, in <module>
+   AttributeError: module 'pkg_3' has no attribute 'mod'
+
+Import Path
+-----------
+
+The import of a ``module`` inspects paths in the following order:
+
+* The directory of the current/main script (or the current directory if there’s no script, such as when Python is running interactively)
+* ``sys.path`` is a list of directories where the Python interpreter searches for modules.
+* Other, installation-dependent directories
+
+.. warning::
+
+   Since the import path starts at the current script, be careful with the names of your own modules, they can override built-in modules like ``math``.
+
+.. code:: python
+
+   >>> sys.path
+   [
+       '',
+       '/usr/lib/python38.zip',
+       '/usr/lib/python3.8',
+       '/usr/lib/python3.8/lib-dynload',
+       '.../samples-python/.env/lib/python3.8/site-packages'
+   ]
+
+
+Important To Retain
+-------------------
+
+* a package is a module decoupled into different modules, private or public.
+* ``from pkg import mod`` adds ``mod`` to the current namespace, not ``pkg``. ``import pkg`` adds ``pkg`` to the current namespace, not ``mod``. ``pkg.mod`` is available iff ``pkg/__init__.py`` contains ``from . import mod``.
+* Developing your modules, mind to delete the ``__pycache__`` directory. It contains the compiled python files. If you don't, you may get unexpected results.
+* The ``import path`` is not the same as the ``system path``. The ``system path`` is used to find the location of the ``python interpreter`` and the ``standard library``. The ``import path`` is used to find the location of ``modules`` and ``packages``.
 
 Literature
 ----------
