@@ -215,6 +215,7 @@ Have a look at the following examples:
 Important To Retain
 -------------------
 
+* namespaces are a way to provide imported objects a unique ID so they don't get overridden by objects with the same name in different modules, also for organization.
 * scopes are evaluated as **LEGB**
 * it is not recommended to use ``global`` and ``nonlocal`` keywords
 * ``locals()`` returns a dictionary with the names and references to clones of the objects in the local namespace
