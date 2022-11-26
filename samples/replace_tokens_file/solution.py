@@ -23,8 +23,8 @@ file = open(path, 'r')
 data = ''
 for line in file:
     data += line
-data.replace(pattern_token_1, "token 1\nreplaced by\nmultiple lines")
-data.replace(pattern_token_2, "token 2 replaced by a single line")
+data = data.replace(pattern_token_1, "token 1\nreplaced by\nmultiple lines")
+data = data.replace(pattern_token_2, "token 2 replaced by a single line")
 data = data.replace(pattern_token_3, "token 3 replaced by a single line")
 file.close()
 
