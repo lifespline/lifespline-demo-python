@@ -1,14 +1,18 @@
 exercise-1
 ==========
 
-execute a complex command from subprocess and print the result
+Execute ``ls | grep sample > res``. Don't leave ``res`` in the file system.
 
-exercise-2
-==========
+Solution
+--------
 
-execute a complex command from subprocess and print the result while the command is being executed
+.. code:: python
 
-exercise-3
-==========
+   import subprocess as sp
+   import os
 
-execute a complex command from subprocess and print the result while the command is being executed, also the stderr
+   ls = sp.Popen("ls", stdout=sp.PIPE)
+   buffer = open('res', 'wb')
+   grep = sp.run("grep sample".split(), stdin=ls.stdout, stdout=buffer)
+   os.system("cat res")
+   os.remove('res')
